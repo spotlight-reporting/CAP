@@ -43,9 +43,11 @@ namespace DotNetCore.CAP.SqlServer.Diagnostics
             {
                 case SqlAfterCommitTransactionMicrosoft:
                 {
-                    if (!TryGetSqlConnection(evt, out SqlConnection? sqlConnection)) return;
+#nullable disable warnings
+                        if (!TryGetSqlConnection(evt, out SqlConnection? sqlConnection)) return;
                     var transactionKey = sqlConnection.ClientConnectionId;
-                    if (_bufferList.TryRemove(transactionKey, out var msgList))
+#nullable enable warnings
+                        if (_bufferList.TryRemove(transactionKey, out var msgList))
                     {
                         foreach (var message in msgList)
                         {
@@ -59,10 +61,11 @@ namespace DotNetCore.CAP.SqlServer.Diagnostics
                 {
                     if (!_bufferList.IsEmpty)
                     {
-                        if (!TryGetSqlConnection(evt, out SqlConnection? sqlConnection)) return;
+#nullable disable warnings
+                            if (!TryGetSqlConnection(evt, out SqlConnection? sqlConnection)) return;
                         var transactionKey = sqlConnection.ClientConnectionId;
-
-                        _bufferList.TryRemove(transactionKey, out _);
+#nullable enable warnings
+                            _bufferList.TryRemove(transactionKey, out _);
                     }
 
                     break;
@@ -70,7 +73,7 @@ namespace DotNetCore.CAP.SqlServer.Diagnostics
             }
         }
 
-        private static bool TryGetSqlConnection(KeyValuePair<string, object?> evt, [NotNullWhen(true)] out SqlConnection? sqlConnection)
+        private static bool TryGetSqlConnection(KeyValuePair<string, object?> evt, out SqlConnection? sqlConnection)
         {
             sqlConnection = GetProperty(evt.Value, "Connection") as SqlConnection;
             return sqlConnection != null;
