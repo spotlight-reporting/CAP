@@ -80,12 +80,11 @@ namespace Microsoft.Extensions.DependencyInjection
             services.Configure(setupAction);
 
             //Startup and Hosted 
-            services.AddSingleton<Bootstrapper>();
 #if NETSTANDARD2_1_OR_GREATER
+            services.AddSingleton<Bootstrapper>();
             services.AddHostedService(sp => sp.GetRequiredService<Bootstrapper>());
 #else
-            // backport from MS definition - https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.Hosting.Abstractions/src/ServiceCollectionHostedServiceExtensions.cs
-            // services.TryAddEnumerable(ServiceDescriptor.Singleton<Hosting.IHostedService>(sp => sp.GetRequiredService<Bootstrapper>()));
+            services.AddHostedService<Bootstrapper>();
 #endif
             services.AddSingleton<IBootstrapper>(sp => sp.GetRequiredService<Bootstrapper>());
 
