@@ -67,6 +67,11 @@ namespace DotNetCore.CAP.Test
                 throw new NotImplementedException();
             }
 
+            public Task<OperateResult> PublishAsyncWithResponse<T>(string name, T? contentObj)
+            {
+                throw new NotImplementedException();
+            }
+
             public void Publish<T>(string name, T contentObj, string callbackName = null)
             {
                 throw new NotImplementedException();

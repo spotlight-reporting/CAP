@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 // ReSharper disable once CheckNamespace
 namespace DotNetCore.CAP
 {
-    internal sealed class AmazonSQSOptionsExtension : ICapOptionsExtension
+    public sealed class AmazonSQSOptionsExtension : ICapOptionsExtension
     {
         private readonly Action<AmazonSQSOptions> _configure;
 

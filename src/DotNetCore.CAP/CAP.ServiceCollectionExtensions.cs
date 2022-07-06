@@ -81,7 +81,12 @@ namespace Microsoft.Extensions.DependencyInjection
 
             //Startup and Hosted 
             services.AddSingleton<Bootstrapper>();
+#if NETSTANDARD2_1_OR_GREATER
             services.AddHostedService(sp => sp.GetRequiredService<Bootstrapper>());
+#else
+            // backport from MS definition - https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.Hosting.Abstractions/src/ServiceCollectionHostedServiceExtensions.cs
+            // services.TryAddEnumerable(ServiceDescriptor.Singleton<Hosting.IHostedService>(sp => sp.GetRequiredService<Bootstrapper>()));
+#endif
             services.AddSingleton<IBootstrapper>(sp => sp.GetRequiredService<Bootstrapper>());
 
             return new CapBuilder(services);
