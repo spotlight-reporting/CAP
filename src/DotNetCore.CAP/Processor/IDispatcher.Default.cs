@@ -61,7 +61,7 @@ namespace DotNetCore.CAP.Processor
             });
 
 
-            var sendResults = Task.WhenAll(Enumerable.Range(0, _options.ProducerThreadCount)
+            Task.WhenAll(Enumerable.Range(0, _options.ProducerThreadCount)
                 .Select(_ => Task.Factory.StartNew(() => Sending(stoppingToken), stoppingToken, TaskCreationOptions.LongRunning, TaskScheduler.Default)).ToArray());
 
             Task.WhenAll(Enumerable.Range(0, _options.ConsumerThreadCount)

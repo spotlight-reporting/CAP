@@ -76,20 +76,6 @@ namespace DotNetCore.CAP
                 ? "Succeeded"
                 : string.Format("{0} : {1}", "Failed", string.Join(",", Errors.Select(x => x.Code).ToList()));
         }
-
-        public void AddErrors(IEnumerable<OperateError> errors)
-        {
-            _errors.AddRange(errors);
-        }
-
-        public void AddError(string errorMessage)
-        {
-            _errors.Add(new OperateError()
-            {
-                Code = "-1",
-                Description = errorMessage
-            });
-        }
     }
 
     /// <summary>
