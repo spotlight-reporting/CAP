@@ -37,6 +37,7 @@ namespace DotNetCore.CAP
             Flush();
         }
 
+#pragma warning disable CS1988  // isn't async if one of the older frameworks, that's life
         public override async Task CommitAsync(CancellationToken cancellationToken = default)
         {
             Debug.Assert(DbTransaction != null);
@@ -47,12 +48,17 @@ namespace DotNetCore.CAP
                     dbTransaction.Commit();
                     break;
                 case IDbContextTransaction dbContextTransaction:
+#if NETSTANDARD2_0 || NETFRAMEWORK
+                    dbContextTransaction.Commit();
+#else
                     await dbContextTransaction.CommitAsync(cancellationToken);
+#endif
                     break;
             }
 
             Flush();
         }
+#pragma warning restore CS1988
 
         public override void Rollback()
         {
@@ -69,6 +75,7 @@ namespace DotNetCore.CAP
             }
         }
 
+#pragma warning disable CS1988  // isn't async if one of the older frameworks, that's life
         public override async Task RollbackAsync(CancellationToken cancellationToken = default)
         {
             Debug.Assert(DbTransaction != null);
@@ -79,10 +86,15 @@ namespace DotNetCore.CAP
                     dbTransaction.Rollback();
                     break;
                 case IDbContextTransaction dbContextTransaction:
+#if NETSTANDARD2_0 || NETFRAMEWORK
+                    dbContextTransaction.Rollback();
+#else
                     await dbContextTransaction.RollbackAsync(cancellationToken);
+#endif
                     break;
             }
         }
+#pragma warning restore CS1988
 
         public override void Dispose()
         {
