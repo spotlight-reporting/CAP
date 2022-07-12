@@ -258,7 +258,7 @@ select [Key], [Count] from aggr with (nolock) where [Key] >= @minKey and [Key] <
         private async Task<MediumMessage?> GetMessageAsync(string tableName, long id)
         {
             var sql = $@"SELECT TOP 1 Id AS DbId, Content, Added, ExpiresAt, Retries FROM {tableName} WITH (readpast) WHERE Id={id}";
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETFRAMEWORK
             using var connection = new SqlConnection(_options.ConnectionString);
 #else
             await using var connection = new SqlConnection(_options.ConnectionString);

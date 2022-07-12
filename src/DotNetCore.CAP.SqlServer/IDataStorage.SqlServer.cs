@@ -138,7 +138,7 @@ namespace DotNetCore.CAP.SqlServer
         public async Task<int> DeleteExpiresAsync(string table, DateTime timeout, int batchCount = 1000,
             CancellationToken token = default)
         {
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETFRAMEWORK
             using var connection = new SqlConnection(_options.Value.ConnectionString);
 #else
             await using var connection = new SqlConnection(_options.Value.ConnectionString);
@@ -175,7 +175,7 @@ namespace DotNetCore.CAP.SqlServer
                 new SqlParameter("@StatusName", state.ToString("G"))
             };
 
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETFRAMEWORK
             using var connection = new SqlConnection(_options.Value.ConnectionString);
 #else
             await using var connection = new SqlConnection(_options.Value.ConnectionString);
@@ -210,7 +210,7 @@ namespace DotNetCore.CAP.SqlServer
             };
 
             List<MediumMessage> result;
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETFRAMEWORK
             using (var connection = new SqlConnection(_options.Value.ConnectionString))
 #else
             await using (var connection = new SqlConnection(_options.Value.ConnectionString))

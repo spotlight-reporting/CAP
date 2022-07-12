@@ -39,7 +39,7 @@ namespace DotNetCore.CAP.SqlServer
             if (cancellationToken.IsCancellationRequested) return;
 
             var sql = CreateDbTablesScript(_options.Value.Schema);
-#if NETSTANDARD2_0
+#if NETSTANDARD2_0 || NETFRAMEWORK
             using (var connection = new SqlConnection(_options.Value.ConnectionString))
 #else
             await using (var connection = new SqlConnection(_options.Value.ConnectionString))
