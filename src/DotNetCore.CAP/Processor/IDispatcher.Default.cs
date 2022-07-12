@@ -112,26 +112,6 @@ namespace DotNetCore.CAP.Processor
             }
         }
 
-        public async Task<OperateResult> Send(MediumMessage message)
-        {
-            try
-            {
-                var result = await _sender.SendAsync(message);
-                if (!result.Succeeded)
-                {
-                    _logger.MessagePublishException(message.Origin?.GetId(), result.ToString(),
-                        result.Exception);
-                }
-                return result;
-            }
-            catch (Exception ex)
-            {
-                var errorMessage = $"An exception occurred when sending a message to the MQ. Id:{message.DbId}";
-                _logger.LogError(ex, errorMessage);
-                return OperateResult.Failed(ex, new OperateError() { Code = "-1", Description = errorMessage });
-            }
-        }
-
         private async Task Sending(CancellationToken cancellationToken)
         {
             try
@@ -151,8 +131,8 @@ namespace DotNetCore.CAP.Processor
                         }
                         catch (Exception ex)
                         {
-                            var errorMessage = $"An exception occurred when sending a message to the MQ. Id:{message.DbId}";
-                            _logger.LogError(ex, errorMessage);
+                            _logger.LogError(ex, 
+                                $"An exception occurred when sending a message to the MQ. Id:{message.DbId}");
                         }
                     }
                 }
@@ -161,7 +141,6 @@ namespace DotNetCore.CAP.Processor
             {
                 // expected
             }
-
         }
 
         private async Task Processing(CancellationToken cancellationToken)

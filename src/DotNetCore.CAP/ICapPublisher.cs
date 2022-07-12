@@ -39,8 +39,6 @@ namespace DotNetCore.CAP
         /// <param name="cancellationToken"></param>
         Task PublishAsync<T>(string name, T? contentObj, IDictionary<string, string?> headers, CancellationToken cancellationToken = default);
 
-        Task<OperateResult> PublishAsyncWithResponse<T>(string name, T? value);
-
         /// <summary>
         /// Publish an object message.
         /// </summary>

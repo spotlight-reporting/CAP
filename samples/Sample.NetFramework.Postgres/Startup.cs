@@ -34,7 +34,7 @@ namespace Sample.NetFramework.Postgres
                 });
                 x.UsePostgreSql(options =>
                 {
-                    options.ConnectionString = "host=spotlight-local;database=CAP;password=wQZkW6VribhtKtN3;username=postgres";
+                    options.ConnectionString = "";
                     options.Schema = "Sample";
                 });
                 x.ConsumingAssembly = Assembly.GetExecutingAssembly();      // if you don't set this, StartIfNotAlreadyRunning doesn't know which assembly to search for CAPSubscribers, and so doesn't find them

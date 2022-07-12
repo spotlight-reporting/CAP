@@ -3,7 +3,6 @@
 
 using DotNetCore.CAP.Internal;
 using DotNetCore.CAP.Persistence;
-using System.Threading.Tasks;
 
 namespace DotNetCore.CAP.Transport
 {
@@ -12,7 +11,5 @@ namespace DotNetCore.CAP.Transport
         void EnqueueToPublish(MediumMessage message);
 
         void EnqueueToExecute(MediumMessage message, ConsumerExecutorDescriptor descriptor);
-
-        Task<OperateResult> Send(MediumMessage message);
     }
 }

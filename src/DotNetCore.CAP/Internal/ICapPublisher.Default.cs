@@ -48,29 +48,6 @@ namespace DotNetCore.CAP.Internal
             return Task.Run(() => Publish(name, value, callbackName), cancellationToken);
         }
 
-        public Task<OperateResult> PublishAsyncWithResponse<T>(string name, T? value)
-        {
-            var message = BuildMessage(name, value, new Dictionary<string, string?>());
-
-            long? tracingTimestamp = null;
-            try
-            {
-                tracingTimestamp = TracingBefore(message);
-
-                var mediumMessage = _storage.StoreMessage(name, message);
-
-                TracingAfter(tracingTimestamp, message);
-
-                return _dispatcher.Send(mediumMessage);
-            }
-            catch (Exception e)
-            {
-                TracingError(tracingTimestamp, message, e);
-
-                return Task.FromResult(OperateResult.Failed(e));
-            }
-        }
-
         public void Publish<T>(string name, T? value, string? callbackName = null)
         {
             var header = new Dictionary<string, string?>
@@ -83,7 +60,32 @@ namespace DotNetCore.CAP.Internal
 
         public void Publish<T>(string name, T? value, IDictionary<string, string?> headers)
         {
-            var message = BuildMessage(name, value, headers);
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+
+            if (!string.IsNullOrEmpty(_capOptions.TopicNamePrefix))
+            {
+                name = $"{_capOptions.TopicNamePrefix}.{name}";
+            }
+
+            if (!headers.ContainsKey(Headers.MessageId))
+            {
+                var messageId = SnowflakeId.Default().NextId().ToString();
+                headers.Add(Headers.MessageId, messageId);
+            }
+
+            if (!headers.ContainsKey(Headers.CorrelationId))
+            {
+                headers.Add(Headers.CorrelationId, headers[Headers.MessageId]);
+                headers.Add(Headers.CorrelationSequence, 0.ToString());
+            }
+            headers.Add(Headers.MessageName, name);
+            headers.Add(Headers.Type, typeof(T).Name);
+            headers.Add(Headers.SentTime, DateTimeOffset.Now.ToString());
+
+            var message = new Message(headers, value);
 
             long? tracingTimestamp = null;
             try
@@ -120,38 +122,6 @@ namespace DotNetCore.CAP.Internal
 
                 throw;
             }
-        }
-
-        private Message BuildMessage<T>(string name, T? value, IDictionary<string, string?> headers)
-        {
-            if (string.IsNullOrEmpty(name))
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (!string.IsNullOrEmpty(_capOptions.TopicNamePrefix))
-            {
-                name = $"{_capOptions.TopicNamePrefix}.{name}";
-            }
-
-            if (!headers.ContainsKey(Headers.MessageId))
-            {
-                var messageId = SnowflakeId.Default().NextId().ToString();
-                headers.Add(Headers.MessageId, messageId);
-            }
-
-            if (!headers.ContainsKey(Headers.CorrelationId))
-            {
-                headers.Add(Headers.CorrelationId, headers[Headers.MessageId]);
-                headers.Add(Headers.CorrelationSequence, 0.ToString());
-            }
-            headers.Add(Headers.MessageName, name);
-            headers.Add(Headers.Type, typeof(T).Name);
-            headers.Add(Headers.SentTime, DateTimeOffset.Now.ToString());
-
-            var message = new Message(headers, value);
-
-            return message;
         }
 
         #region tracing

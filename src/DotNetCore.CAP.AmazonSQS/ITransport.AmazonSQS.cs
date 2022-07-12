@@ -151,7 +151,6 @@ namespace DotNetCore.CAP.AmazonSQS
                 return true;
             }
 
-            _logger.LogWarning($"Creating SNS topic {topicName}");
             var response = _snsClient!.CreateTopicAsync(topicName).GetAwaiter().GetResult();
 
             if (string.IsNullOrEmpty(response.TopicArn))
@@ -160,7 +159,6 @@ namespace DotNetCore.CAP.AmazonSQS
             }
             
             topicArn = response.TopicArn;
-            _logger.LogWarning($"SNS topic {topicName} created with arn {topicArn}");
 
             _topicArnMaps.Add(topicName, topicArn);
             return true;
