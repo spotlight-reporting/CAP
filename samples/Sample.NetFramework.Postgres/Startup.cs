@@ -1,11 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Owin;
-using Owin;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Web.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Owin;
+using Owin;
 
 [assembly: OwinStartup(typeof(Sample.NetFramework.Postgres.Startup))]
 
@@ -34,10 +33,11 @@ namespace Sample.NetFramework.Postgres
                 });
                 x.UsePostgreSql(options =>
                 {
-                    options.ConnectionString = "";
+                    options.ConnectionString = "<INSERT HERE>";
                     options.Schema = "Sample";
                 });
-                x.ConsumingAssembly = Assembly.GetExecutingAssembly();      // if you don't set this, StartIfNotAlreadyRunning doesn't know which assembly to search for CAPSubscribers, and so doesn't find them
+                x.ConsumingAssembly = Assembly.GetExecutingAssembly();      // this has to be the assembly where your [CAPSubscribe] methods are defined
+                                                                            //          - if you don't set this, CAP won't find and register those methods as listeners
             });
 
             // note, if you're using a logger other than Microsoft.Extensions.Logging.ILogger, you still need this
@@ -53,12 +53,12 @@ namespace Sample.NetFramework.Postgres
                 services.AddTransient(controllerType);
         }
 
-        private IDependencyResolver ConfigureDI(ServiceCollection services)
+        private IDependencyResolver ConfigureDI(ServiceCollection serviceCollection)
         {
-            // note, if you're using DI other than Microsoft.Extensions, just populate services into it (to get all the CAP DI registrations) instead of this
+            // note, if you're using DI other than Microsoft.Extensions, just populate serviceCollection into that (to get all the CAP DI registrations) instead of doing this
 
             // this is how to do it for an MVC project - would be different for a WebAPI or Console App project
-            var dependencyResolver = new DefaultDependencyResolver(services.BuildServiceProvider());
+            var dependencyResolver = new DefaultDependencyResolver(serviceCollection.BuildServiceProvider());
             DependencyResolver.SetResolver(dependencyResolver);
             return dependencyResolver;
         }
@@ -68,8 +68,7 @@ namespace Sample.NetFramework.Postgres
             // and start CAP running (normally, this is done automatically by CAP as a IHost background job,
             // but .NET Framework doesn't run the infrastructure for this, so you need to do it manually)
 
-            // (or do this using Hangfire.IO, etc, but note it MUST be running from the same DI container as 
-            // we have to start, run all publishing\subscribing, and dispose of the same singleton instance of Bootstrapper)            
+            // (or do this using Hangfire.IO, etc, but note it MUST be running from the same DI container since the Bootstrapper instance MUST be a singleton)
             var capBootstrapper = dependencyResolver.GetService<DotNetCore.CAP.Internal.Bootstrapper>();
             capBootstrapper.StartIfNotAlreadyRunning();
 

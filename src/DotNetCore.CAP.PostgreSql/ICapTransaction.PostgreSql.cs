@@ -37,7 +37,7 @@ namespace DotNetCore.CAP
             Flush();
         }
 
-#pragma warning disable CS1988  // isn't async if one of the older frameworks, that's life
+#pragma warning disable CS1988  // this method is async only if >= NETSTANDARD2.1 (since that's when EF started supporting it) - suppress 'not async' warning for the older frameworks
         public override async Task CommitAsync(CancellationToken cancellationToken = default)
         {
             Debug.Assert(DbTransaction != null);
@@ -75,7 +75,7 @@ namespace DotNetCore.CAP
             }
         }
 
-#pragma warning disable CS1988  // isn't async if one of the older frameworks, that's life
+#pragma warning disable CS1988  // this method is async only if >= NETSTANDARD2.1 (since that's when EF started supporting it) - suppress 'not async' warning for the older frameworks
         public override async Task RollbackAsync(CancellationToken cancellationToken = default)
         {
             Debug.Assert(DbTransaction != null);

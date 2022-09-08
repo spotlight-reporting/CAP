@@ -44,10 +44,10 @@ namespace DotNetCore.CAP.SqlServer.Diagnostics
                 case SqlAfterCommitTransactionMicrosoft:
                 {
 #nullable disable warnings
-                        if (!TryGetSqlConnection(evt, out SqlConnection? sqlConnection)) return;
+                    if (!TryGetSqlConnection(evt, out SqlConnection? sqlConnection)) return;
                     var transactionKey = sqlConnection.ClientConnectionId;
 #nullable enable warnings
-                        if (_bufferList.TryRemove(transactionKey, out var msgList))
+                    if (_bufferList.TryRemove(transactionKey, out var msgList))
                     {
                         foreach (var message in msgList)
                         {
@@ -62,10 +62,10 @@ namespace DotNetCore.CAP.SqlServer.Diagnostics
                     if (!_bufferList.IsEmpty)
                     {
 #nullable disable warnings
-                            if (!TryGetSqlConnection(evt, out SqlConnection? sqlConnection)) return;
+                        if (!TryGetSqlConnection(evt, out SqlConnection? sqlConnection)) return;
                         var transactionKey = sqlConnection.ClientConnectionId;
 #nullable enable warnings
-                            _bufferList.TryRemove(transactionKey, out _);
+                        _bufferList.TryRemove(transactionKey, out _);
                     }
 
                     break;
