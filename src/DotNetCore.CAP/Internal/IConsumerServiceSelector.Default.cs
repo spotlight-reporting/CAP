@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace DotNetCore.CAP.Internal
@@ -21,6 +22,7 @@ namespace DotNetCore.CAP.Internal
     {
         private readonly CapOptions _capOptions;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<ConsumerServiceSelector> _logger;
         private readonly Assembly _consumingAssembly;
 
         /// <summary>
@@ -35,6 +37,7 @@ namespace DotNetCore.CAP.Internal
         {
             _serviceProvider = serviceProvider;
             _capOptions = serviceProvider.GetRequiredService<IOptions<CapOptions>>().Value;
+            _logger = serviceProvider.GetRequiredService<ILogger<ConsumerServiceSelector>>();
             _consumingAssembly = Assembly.GetEntryAssembly();
 
             _cacheList = new ConcurrentDictionary<string, List<RegexExecuteDescriptor<ConsumerExecutorDescriptor>>>();
@@ -60,7 +63,7 @@ namespace DotNetCore.CAP.Internal
 
             executorDescriptorList.AddRange(FindConsumersFromControllerTypes());
 
-            executorDescriptorList = executorDescriptorList.Distinct(new ConsumerExecutorDescriptorComparer()).ToList();
+            executorDescriptorList = executorDescriptorList.Distinct(new ConsumerExecutorDescriptorComparer(_logger)).ToList();
 
             return executorDescriptorList;
         }
