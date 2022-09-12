@@ -50,6 +50,7 @@ namespace DotNetCore.CAP.Internal
         {
             _serviceProvider = serviceProvider;
             _capOptions = serviceProvider.GetRequiredService<IOptions<CapOptions>>().Value;
+            _logger = serviceProvider.GetRequiredService<ILogger<ConsumerServiceSelector>>();
             _consumingAssembly = consumingAssembly;
 
             _cacheList = new ConcurrentDictionary<string, List<RegexExecuteDescriptor<ConsumerExecutorDescriptor>>>();
