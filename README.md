@@ -16,6 +16,19 @@ In the process of building an SOA or MicroService system, we usually need to use
 
 You can also use CAP as an EventBus. CAP provides a simpler way to implement event publishing and subscriptions. You do not need to inherit or implement any interface during subscription and sending process.
 
+## Fork Notes
+
+This is a fork of [https://github.com/dotnetcore/CAP](https://github.com/dotnetcore/CAP) in order to support .NET Framework\.NET Standard 2.0 (as well as .NET Standard 2.1, like the original CAP library). Feel free to use this, but be aware we will only keep it up to date with the original on a best-efforts basis.
+
+Versioning strategy is:  
+`{originalCAP version major}.{originalCAP version minor}.{originalCAP version patch}.{fork version}`  
+i.e. if the version number is 2.1.1.100, then it includes all changes in version 2.1.1 of the original CAP project, and is version 100 within the fork (note, version 100 is our first stable version).  
+
+To use:  
+- See sample project Sample.NetFramework.Postgres for code on how to get it running (particularly, read the comments in Startup.cs)  
+  
+Note, we do not publish public nuget packages of this fork, so if you want to consume as nuget then you'll need to pack and publish your own copy.  
+
 ## Architecture overview
 
 ![cap.png](https://cap.dotnetcore.xyz/img/architecture-new.png)
