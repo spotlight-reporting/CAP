@@ -38,7 +38,7 @@ namespace DotNetCore.CAP.PostgreSql
             if (cancellationToken.IsCancellationRequested) return;
 
             var sql = CreateDbTablesScript(_options.Value.Schema);
-            await using (var connection = new NpgsqlConnection(_options.Value.ConnectionString))
+            await using (var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString))
                 connection.ExecuteNonQuery(sql);
 
             _logger.LogDebug("Ensuring all create database tables script are applied.");

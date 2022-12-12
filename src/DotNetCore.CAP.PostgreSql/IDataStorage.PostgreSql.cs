@@ -75,7 +75,7 @@ namespace DotNetCore.CAP.PostgreSql
 
             if (dbTransaction == null)
             {
-                using var connection = new NpgsqlConnection(_options.Value.ConnectionString);
+                using var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString);
                 connection.ExecuteNonQuery(sql, sqlParams: sqlParams);
             }
             else
@@ -138,7 +138,7 @@ namespace DotNetCore.CAP.PostgreSql
         public async Task<int> DeleteExpiresAsync(string table, DateTime timeout, int batchCount = 1000,
             CancellationToken token = default)
         {
-            await using var connection = new NpgsqlConnection(_options.Value.ConnectionString);
+            await using var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString);
             return connection.ExecuteNonQuery(
                 $"DELETE FROM {table} WHERE \"Id\" IN (SELECT \"Id\" FROM {table} WHERE \"ExpiresAt\" < @timeout LIMIT @batchCount);", null,
                 new NpgsqlParameter("@timeout", timeout), new NpgsqlParameter("@batchCount", batchCount));
@@ -152,7 +152,7 @@ namespace DotNetCore.CAP.PostgreSql
 
         public IMonitoringApi GetMonitoringApi()
         {
-            return new PostgreSqlMonitoringApi(_options, _initializer);
+            return new PostgreSqlMonitoringApi(_initializer);
         }
 
         private async Task ChangeMessageStateAsync(string tableName, MediumMessage message, StatusName state)
@@ -169,7 +169,7 @@ namespace DotNetCore.CAP.PostgreSql
                 new NpgsqlParameter("@StatusName", state.ToString("G"))
             };
 
-            await using var connection = new NpgsqlConnection(_options.Value.ConnectionString);
+            await using var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString);
             connection.ExecuteNonQuery(sql, sqlParams: sqlParams);
         }
 
@@ -179,7 +179,7 @@ namespace DotNetCore.CAP.PostgreSql
                 $"INSERT INTO {_recName}(\"Id\",\"Version\",\"Name\",\"Group\",\"Content\",\"Retries\",\"Added\",\"ExpiresAt\",\"StatusName\")" +
                 $"VALUES(@Id,'{_capOptions.Value.Version}',@Name,@Group,@Content,@Retries,@Added,@ExpiresAt,@StatusName) RETURNING \"Id\";";
 
-            using var connection = new NpgsqlConnection(_options.Value.ConnectionString);
+            using var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString);
             connection.ExecuteNonQuery(sql, sqlParams: sqlParams);
         }
 
@@ -197,7 +197,7 @@ namespace DotNetCore.CAP.PostgreSql
                 new NpgsqlParameter("@Added", fourMinAgo)
             };
 
-            await using var connection = new NpgsqlConnection(_options.Value.ConnectionString);
+            await using var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString);
             var result = connection.ExecuteReader(sql, reader =>
             {
                 var messages = new List<MediumMessage>();

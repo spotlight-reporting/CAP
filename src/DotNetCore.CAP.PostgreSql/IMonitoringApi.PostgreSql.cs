@@ -9,20 +9,17 @@ using DotNetCore.CAP.Internal;
 using DotNetCore.CAP.Messages;
 using DotNetCore.CAP.Monitoring;
 using DotNetCore.CAP.Persistence;
-using Microsoft.Extensions.Options;
 using Npgsql;
 
 namespace DotNetCore.CAP.PostgreSql
 {
     public class PostgreSqlMonitoringApi : IMonitoringApi
     {
-        private readonly PostgreSqlOptions _options;
         private readonly string _pubName;
         private readonly string _recName;
 
-        public PostgreSqlMonitoringApi(IOptions<PostgreSqlOptions> options, IStorageInitializer initializer)
+        public PostgreSqlMonitoringApi(IStorageInitializer initializer)
         {
-            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
             _pubName = initializer.GetPublishedTableName();
             _recName = initializer.GetReceivedTableName();
         }
@@ -49,7 +46,7 @@ namespace DotNetCore.CAP.PostgreSql
     ) AS ""ReceivedFailed"";";
 
             StatisticsDto statistics;
-            using (var connection = new NpgsqlConnection(_options.ConnectionString))
+            using (var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString))
             {
                 statistics = connection.ExecuteReader(sql, reader =>
                 {
@@ -86,7 +83,7 @@ namespace DotNetCore.CAP.PostgreSql
             var sqlQuery =
                 $"select * from {tableName} where 1=1 {where} order by \"Added\" desc offset @Offset limit @Limit";
 
-            using var connection = new NpgsqlConnection(_options.ConnectionString);
+            using var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString);
 
             var count = connection.ExecuteScalar<int>($"select count(1) from {tableName} where 1=1 {where}",
                 new NpgsqlParameter("@StatusName", queryDto.StatusName ?? string.Empty),
@@ -168,7 +165,7 @@ namespace DotNetCore.CAP.PostgreSql
             var sqlQuery =
                 $"select count(\"Id\") from {tableName} where Lower(\"StatusName\") = Lower(@state)";
 
-            using var connection = new NpgsqlConnection(_options.ConnectionString);
+            using var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString);
             return connection.ExecuteScalar<int>(sqlQuery, new NpgsqlParameter("@state", statusName));
         }
 
@@ -211,7 +208,7 @@ select ""Key"",""Count"" from aggr where ""Key"" >= @minKey and ""Key"" <= @maxK
             };
 
             Dictionary<string, int> valuesMap;
-            using (var connection = new NpgsqlConnection(_options.ConnectionString))
+            using (var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString))
             {
                 valuesMap = connection.ExecuteReader(sqlQuery, reader =>
                 {
@@ -246,7 +243,7 @@ select ""Key"",""Count"" from aggr where ""Key"" >= @minKey and ""Key"" <= @maxK
         {
             var sql = $@"SELECT ""Id"" AS ""DbId"", ""Content"", ""Added"", ""ExpiresAt"", ""Retries"" FROM {tableName} WHERE ""Id""={id} FOR UPDATE SKIP LOCKED";
 
-            await using var connection = new NpgsqlConnection(_options.ConnectionString);
+            await using var connection = new NpgsqlConnection(PostgreSqlConnectionDataManager.ConnectionString);
             var mediumMessage = connection.ExecuteReader(sql, reader =>
             {
                 MediumMessage? message = null;

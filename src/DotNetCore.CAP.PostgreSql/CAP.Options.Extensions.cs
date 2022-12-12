@@ -3,6 +3,7 @@
 
 using System;
 using DotNetCore.CAP;
+using DotNetCore.CAP.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 
 // ReSharper disable once CheckNamespace
@@ -20,6 +21,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (configure == null) throw new ArgumentNullException(nameof(configure));
 
             configure += x => x.Version = options.Version;
+            configure += x => PostgreSqlConnectionDataManager.ConnectionString = x.ConnectionString;
 
             options.RegisterExtension(new PostgreSqlCapOptionsExtension(configure));
 
